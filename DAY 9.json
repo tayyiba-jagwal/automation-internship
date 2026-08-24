@@ -1,0 +1,55 @@
+{
+  "name": "My workflow 7",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c1ad0da3-5505-425e-9ef9-ea5bd6024593",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const students = [\n  {\n    name: \"  ali KHAN \",\n    email: \"ALI.KHAN@GMAIL.COM\",\n    score: 92\n  },\n  {\n    name: \"sara ahmed\",\n    email: \"Sara.Ahmed@GMAIL.COM \",\n    score: 85\n  },\n  {\n    name: \"  AHMED raza\",\n    email: \"AHMED.RAZA@GMAIL.COM\",\n    score: 76\n  },\n  {\n    name: \"ayesha MALIK  \",\n    email: \"AYESHA.MALIK@GMAIL.COM\",\n    score: 68\n  },\n  {\n    name: \"  usman ali\",\n    email: \"Usman.Ali@GMAIL.COM\",\n    score: 59\n  },\n  {\n    name: \"fatima KHAN\",\n    email: \"FATIMA.KHAN@GMAIL.COM\",\n    score: 88\n  },\n  {\n    name: \"HAMZA iqbal \",\n    email: \"HAMZA.IQBAL@GMAIL.COM\",\n    score: 73\n  },\n  {\n    name: \"  zainab ahmed\",\n    email: \"ZAINAB.AHMED@GMAIL.COM\",\n    score: 91\n  },\n  {\n    name: \"bilal HUSSAIN\",\n    email: \"Bilal.Hussain@GMAIL.COM\",\n    score: 64\n  },\n  {\n    name: \"  hina malik \",\n    email: \"HINA.MALIK@GMAIL.COM\",\n    score: 55\n  },\n  {\n    name: \"omer FAROOQ\",\n    email: \"OMER.FAROOQ@GMAIL.COM\",\n    score: 81\n  },\n  {\n    name: \"  maryam ali\",\n    email: \"Maryam.Ali@GMAIL.COM\",\n    score: 78\n  },\n  {\n    name: \"danish KHAN  \",\n    email: \"DANISH.KHAN@GMAIL.COM\",\n    score: 45\n  },\n  {\n    name: \"iqra AHMED\",\n    email: \"IQRA.AHMED@GMAIL.COM\",\n    score: 89\n  },\n  {\n    name: \"  saad raza \",\n    email: \"SAAD.RAZA@GMAIL.COM\",\n    score: 62\n  }\n];\n\nconst transformed = students.map(student => {\n  const cleanName = student.name\n    .trim()\n    .toLowerCase()\n    .split(\" \")\n    .filter(word => word !== \"\")\n    .map(word => word.charAt(0).toUpperCase() + word.slice(1))\n    .join(\" \");\n\n  const cleanEmail = student.email.trim().toLowerCase();\n\n  let grade;\n\n  if (student.score >= 90) {\n    grade = \"A\";\n  } else if (student.score >= 80) {\n    grade = \"B\";\n  } else if (student.score >= 70) {\n    grade = \"C\";\n  } else if (student.score >= 60) {\n    grade = \"D\";\n  } else {\n    grade = \"F\";\n  }\n\n  return {\n    name: cleanName,\n    email: cleanEmail,\n    score: Number(student.score),\n    grade: grade\n  };\n});\n\nconst filtered = transformed.filter(student => {\n  return student.grade === \"A\" || student.grade === \"B\";\n});\n\nreturn filtered.map(student => ({\n  json: student\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a7e65441-aef1-4cb0-878b-c6801e49deb0",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6fef5f7f-81c1-48c8-9cfd-9b5039423bef",
+  "meta": {
+    "instanceId": "aba4da0a0a4dbb957085b8f56d4f8710857a32b8da6181b464780c53255fa37e"
+  },
+  "nodeGroups": [],
+  "id": "oer6QV6Qs1uBr96D",
+  "tags": []
+}

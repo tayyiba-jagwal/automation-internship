@@ -1,0 +1,473 @@
+{
+  "name": "AI Email Classification Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "id": "b7dbe1eb-c561-42bd-ac8e-dc7d15c5d57d",
+      "name": "New Email (Gmail Trigger)",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -992,
+        304
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bX7Yx1T7gQBBcqG0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Read the raw input from previous node\nconst inputData = $input.first().json;\nlet rawText = \"\";\n\n// 1. Check for nested Gemini/LLM parts output\nif (inputData.parts && inputData.parts[0] && inputData.parts[0].text) {\n  rawText = inputData.parts[0].text;\n} else if (typeof inputData.text === 'string') {\n  rawText = inputData.text;\n} else if (typeof inputData.text === 'object') {\n  rawText = JSON.stringify(inputData.text);\n} else {\n  rawText = JSON.stringify(inputData);\n}\n\n// 2. Strip markdown codeblock backticks if present\nrawText = rawText.replace(/```json|```/gi, \"\").trim();\n\nlet category = \"General\";\n\n// 3. Attempt JSON parse\ntry {\n  const parsed = JSON.parse(rawText);\n  if (parsed.category) {\n    category = parsed.category.toString().trim();\n  } else if (typeof parsed === 'string') {\n    category = parsed.trim();\n  }\n} catch (e) {\n  // 4. Fallback string keyword detection\n  const upper = rawText.toUpperCase();\n  if (upper.includes(\"SALES\")) category = \"Sales\";\n  else if (upper.includes(\"SUPPORT\")) category = \"Support\";\n  else if (upper.includes(\"COMPLAINT\")) category = \"Complaint\";\n  else if (upper.includes(\"INVOICE\")) category = \"Invoice\";\n  else if (upper.includes(\"SPAM\")) category = \"Spam\";\n}\n\n// Capitalize exact casing (e.g., \"Sales\", \"Support\")\ncategory = category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();\n\nreturn [{\n  \"category\": \"Invoice\"\n}];"
+      },
+      "id": "1cea4fbb-6c7a-4298-88ed-7e6f1d1a25d8",
+      "name": "Extract Classification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -512,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Sales",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ba1f5e95-0f79-44c6-b583-b5f7b5b2d2d1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Support",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e26ba803-f0a2-485f-a0e3-28dfe11275a8"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Complaint",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "487790c5-a464-424e-a6a0-3455526a52df"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Invoice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a593ed63-f679-417f-8555-3e0370b0f500"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ba52d811-f184-4bbc-adb6-63addd8b4e6c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "General",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ab679edc-377b-44aa-953d-ff87568c3d48"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 5
+        }
+      },
+      "id": "5547e5a6-de3a-4bf2-8389-8c0e40dd99f4",
+      "name": "Route by Category",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -272,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "tayyibajagwal1@gmail.com",
+        "subject": "Pricing Inquiry",
+        "message": "Hello, I am interested in your services. Could you please send me your pricing plans and available packages? I would also like to know if you offer any discounts for new customers. Thank you.",
+        "options": {}
+      },
+      "id": "ddf97296-7a9f-4be7-a091-eb96bf8d1a99",
+      "name": "Label: Sales",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "567157eb-82fc-4b9e-8b5f-b984153f722a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bX7Yx1T7gQBBcqG0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "tayyibajagwal1@gmail.com",
+        "subject": "Complaint About Service",
+        "message": "Hello, I am very disappointed with the service I received. I contacted your team several times, but my problem has still not been resolved. Please investigate this issue and provide a solution as soon as possible. Regards.",
+        "options": {}
+      },
+      "id": "734b37a8-b678-445f-8af9-9f38a84bb3b0",
+      "name": "Label: Complaint",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        240
+      ],
+      "webhookId": "34c5ca7c-f59d-424e-8e9a-a6e11af7a27d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bX7Yx1T7gQBBcqG0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "tayyibajagwal1@gmail.com",
+        "subject": "Invoice for August",
+        "message": "Hello, Please find the invoice for the services provided in August. Kindly confirm whether the payment has been received and processed. Thank you.",
+        "options": {}
+      },
+      "id": "19b3120e-4e25-43b5-8552-27326689c6b3",
+      "name": "Label: Invoice",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        352
+      ],
+      "webhookId": "12f29964-d534-4e06-b5a2-191599c41460",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bX7Yx1T7gQBBcqG0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "tayyibajagwal1@gmail.com",
+        "subject": "Congratulations! You Won a Prize",
+        "message": "Congratulations! You have been selected to receive a special cash prize. Claim your reward immediately by clicking the link below. Thank you.",
+        "options": {}
+      },
+      "id": "26201347-6cfc-4a5d-8f19-bfb625591f56",
+      "name": "Label: Spam",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        480
+      ],
+      "webhookId": "7a05d6d0-98cc-44f9-9013-eb4d5f6f7126",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bX7Yx1T7gQBBcqG0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "tayyibajagwal1@gmail.com",
+        "subject": "Meeting Confirmation",
+        "message": "Hello, This is to confirm that our meeting is scheduled for tomorrow at 10 AM. Thank you.",
+        "options": {}
+      },
+      "id": "a7750e0e-4b65-4091-8d87-f816e61e0a35",
+      "name": "Label: General",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        608
+      ],
+      "webhookId": "43fbd304-77d8-4df6-b1f2-d1717c00286d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bX7Yx1T7gQBBcqG0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "tayyibajagwal1@gmail.com",
+        "subject": "Unable to Login",
+        "message": "Hello, I am unable to log into my account. I have tried resetting my password, but I am still unable to access my account. Please help me resolve this issue. Thank you.",
+        "options": {}
+      },
+      "id": "e4e6ddd5-d3f0-40e4-ba31-663244f5f966",
+      "name": "Label: Support",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "ed241bbf-3198-4535-945d-42037a247b3e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bX7Yx1T7gQBBcqG0",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert email classification AI. \n\nAnalyze the following incoming email content and classify it into EXACTLY ONE of these categories:\n- Sales\n- Support\n- Complaint\n- Invoice\n- Spam\n- General\n\nRules:\n1. Respond ONLY with a valid JSON object: {\"category\": \"CATEGORY_NAME\"}\n2. Do not include any explanations, markdown formatting, or extra text.\n\nEmail Content:\n{{ $json.snippet || $json.text || $json.body || $json.subject }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -800,
+        112
+      ],
+      "id": "0ef5cd83-b27c-4658-901b-22b48bf28fe6",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "groq/compound-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        368
+      ],
+      "id": "4c4fa65b-05d4-4297-84bf-2baf29849c50",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "yIbxpHVuxqLHcQlK",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract Classification": {
+      "main": [
+        [
+          {
+            "node": "Route by Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Category": {
+      "main": [
+        [
+          {
+            "node": "Label: Sales",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Complaint",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Spam",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: General",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Email (Gmail Trigger)": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Extract Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3425eda2-553d-4b51-9d7c-289d2257f532",
+  "meta": {
+    "instanceId": "67736cbdfcb59f25d119984b6f32071b416a4e164ca560c448a6971506943b67"
+  },
+  "nodeGroups": [],
+  "id": "EkYIHA1Oi9TluzKP",
+  "tags": []
+}

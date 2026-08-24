@@ -1,0 +1,260 @@
+{
+  "name": "Day10 Webhook Form Submission",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "form-submission",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "04b2a329-8b2a-4c7f-961d-0870a6abb6c6",
+      "name": "Webhook",
+      "webhookId": "089fc433-0311-4c9e-a16c-3eea228cf143"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5de32ee8-03e9-4f9d-a9a1-49926005d486",
+              "leftValue": "=$json.body.name",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "856135e3-afbf-4897-95e4-c1ffb2959c28",
+              "leftValue": "=$json.body.email",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "89e73b89-92a8-4f4c-a711-3b55850ae44d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1l_mB9AbzS2qicpM5ILYAnMVjPxlXUQZWfIF5DA_fRJE",
+          "mode": "list",
+          "cachedResultName": "form submissions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l_mB9AbzS2qicpM5ILYAnMVjPxlXUQZWfIF5DA_fRJE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1l_mB9AbzS2qicpM5ILYAnMVjPxlXUQZWfIF5DA_fRJE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{$json.body.email}}",
+            "Name": "={{$json.body.name}}",
+            "Phone": "={{$json.body.phone}}",
+            "Course": "={{$json.body.course}}",
+            "Message": "={{$json.body.message}}",
+            "Status": "Received",
+            "Submitted At": "11/8/2026"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Course",
+              "displayName": "Course",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Submitted At",
+              "displayName": "Submitted At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        -89
+      ],
+      "id": "eb8d9978-7f2b-4a64-9e25-27d58f1104fd",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pQQy2KuZCHZoeq4m",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Form Submission Received",
+        "message": "=Hello ,{{ $json.Name }}  Thank you for submitting the form.  We have successfully received your form submission.  Course{{ $json.Course }}:   Your information has been saved successfully.  Regards, AI Automation Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "be2961ef-7d49-4b00-ab4d-a685f58a9995",
+      "name": "Send a message",
+      "webhookId": "d5ae920e-63d9-4f47-a86b-284c615d16b6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LH7yFoBLjORtZXFh",
+          "name": "Gmail account 5"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "87912890-5097-446e-abd2-025fca9266fc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aba4da0a0a4dbb957085b8f56d4f8710857a32b8da6181b464780c53255fa37e"
+  },
+  "nodeGroups": [],
+  "id": "eiY1LTkpHtvnHPTb",
+  "tags": []
+}

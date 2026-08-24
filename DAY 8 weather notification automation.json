@@ -1,0 +1,210 @@
+{
+  "name": "weather notification automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e371ae61-2653-4b51-bea2-92b6945aa14d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "34.33023"
+            },
+            {
+              "name": "longitude",
+              "value": "73.19679"
+            },
+            {
+              "name": "daily",
+              "value": "precipitation_probability_max"
+            },
+            {
+              "name": "timezone",
+              "value": "Asia/Karachi"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d2901a1d-dbe5-468d-850b-a2d33a6dacb6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e93f3ab0-3d40-4f27-bc96-c93a8bae58ed",
+              "name": "rain_probability",
+              "value": "={{ $json.daily.precipitation_probability_max[0] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        416,
+        0
+      ],
+      "id": "98a53200-9ccb-485b-b478-7cbcf58f808d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2beabde1-1b0f-4537-9214-e8057ed8214e",
+              "leftValue": "={{ $json.rain_probability }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "ddec9a37-6df0-4eaa-bc65-3312c492ac9a",
+              "leftValue": "={{ $json.rain_probability }}",
+              "rightValue": "50",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "d506ce94-336c-451a-867f-37146fd73fa2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "tayyibajagwal1@gmail.com",
+        "subject": "Weather Alert - Mansehra",
+        "message": "=Rain is expected today – please carry an umbrella.  Rain probability in Mansehra: {{ $json.rain_probability }}%",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        -16
+      ],
+      "id": "3f2a8abc-433b-4013-89a6-28b6a26fd5bd",
+      "name": "Send a message",
+      "webhookId": "23faa8f5-489f-44ba-9771-753b00eaae16",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LH7yFoBLjORtZXFh",
+          "name": "Gmail account 5"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fc4e298b-8762-426d-8bd5-35dc14ae4a2b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aba4da0a0a4dbb957085b8f56d4f8710857a32b8da6181b464780c53255fa37e"
+  },
+  "nodeGroups": [],
+  "id": "u1sYP6wrAbjeZLAM",
+  "tags": []
+}

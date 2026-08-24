@@ -1,0 +1,346 @@
+{
+  "name": "My workflow 8",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "day11-lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a36ac59b-1f8b-4d83-a680-bc9204e98ceb",
+      "name": "Webhook",
+      "webhookId": "5fa3e3c9-6136-49fa-b5ff-7150f9deccd5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "394c9c1c-6b86-4263-990a-31ee5cd254f7",
+              "leftValue": "={{$json.body.Email}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "94ed5921-4708-4edf-bc30-71e7356ce666",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "115Ely_ZnqEPSPp1HiHjFLDWpyPMtZE7wn2oOr3oh6-8",
+          "mode": "list",
+          "cachedResultName": "SAVE LEAD ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/115Ely_ZnqEPSPp1HiHjFLDWpyPMtZE7wn2oOr3oh6-8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/115Ely_ZnqEPSPp1HiHjFLDWpyPMtZE7wn2oOr3oh6-8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Webhook').item.json.body.Name }}",
+            "Email": "={{ $('Webhook').item.json.body.Email }}",
+            "Company": "={{$('Webhook').item.json.body.Company}}",
+            "Country": "={{$('Webhook').item.json.body.Country}}",
+            "Lead Status": "New",
+            "Phone": "={{$('Webhook').item.json.body.Phone}}",
+            "Enriched Data": "={{ $json.data.objects[0].capitals[0] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Enriched Data",
+              "displayName": "Enriched Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "087bfeef-72d2-4aa6-b029-bb504cbf0441",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pQQy2KuZCHZoeq4m",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "10152d5e-1d73-482e-b598-6effeff16974",
+              "name": "",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "37453d4a-e894-47ff-b5c7-e8e1426f4c4c",
+              "name": "name ",
+              "value": "={{$json.body.Name}}",
+              "type": "string"
+            },
+            {
+              "id": "dadd8f6c-0f17-4235-8236-af58577bd4ea",
+              "name": "email",
+              "value": "={{$json.body.Email}}",
+              "type": "string"
+            },
+            {
+              "id": "67d67bb1-16bd-476f-8264-d3a2edb53034",
+              "name": "company",
+              "value": "={{$json.body.Company}}",
+              "type": "string"
+            },
+            {
+              "id": "52cdde88-f240-4fff-82e6-6eea73755ed2",
+              "name": "phone",
+              "value": "={{$json.body.Phone}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        208,
+        0
+      ],
+      "id": "de95eb26-6668-4e1b-a8ad-7c60b8bcc649",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://api.restcountries.com/countries/v5/names.common/pakistan",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pretty",
+              "value": "1"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer rc_live_1345d127c11e492cb315657288dc1059"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "62f72e62-37f5-4d58-becf-698c11f3df8a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=New Lead Received - {{$node[\"Webhook\"].json.body.Name}}",
+        "message": "=A new lead has been received.\n\nName: {{$node[\"Webhook\"].json.body.Name}}\nEmail: {{$node[\"Webhook\"].json.body.Email}}\nCompany: {{$node[\"Webhook\"].json.body.Company}}\nPhone: {{$node[\"Webhook\"].json.body.Phone}}\nCountry: {{$node[\"Webhook\"].json.body.Country}}\n\nLead Status: New\n\nThe lead has been validated, enriched using the external API, and saved to Google Sheets.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "b6adb211-56f7-4afe-ae32-00eeba62fedb",
+      "name": "Send a message",
+      "webhookId": "560b9a9f-efbe-465d-9357-ff85d31be8f4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LH7yFoBLjORtZXFh",
+          "name": "Gmail account 5"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9f98e218-8829-4c4b-a1c2-bf67e6dc35b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "aba4da0a0a4dbb957085b8f56d4f8710857a32b8da6181b464780c53255fa37e"
+  },
+  "nodeGroups": [],
+  "id": "GYB1rJfdMhsxsboa",
+  "tags": []
+}

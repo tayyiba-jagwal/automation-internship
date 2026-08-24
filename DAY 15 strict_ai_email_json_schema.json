@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": [
+        "Sales",
+        "Support",
+        "Complaint"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High"
+      ]
+    },
+    "sentiment": {
+      "type": "string",
+      "enum": [
+        "Positive",
+        "Neutral",
+        "Negative"
+      ]
+    },
+    "department": {
+      "type": "string",
+      "enum": [
+        "Sales",
+        "Customer Support",
+        "Management"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "category",
+    "priority",
+    "sentiment",
+    "department",
+    "summary"
+  ],
+  "additionalProperties": false
+}

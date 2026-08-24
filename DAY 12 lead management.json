@@ -1,0 +1,552 @@
+{
+  "name": "My workflow 9",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const lead = $json.body || $json;\n\nconst requiredFields = [\n  \"Name\",\n  \"Email\",\n  \"Company\",\n  \"Service\",\n  \"Budget\"\n];\n\nconst missingFields = requiredFields.filter(\n  field => lead[field] === undefined || lead[field] === null || lead[field] === \"\"\n);\n\nreturn {\n  json: {\n    ...lead,\n    isValid: missingFields.length === 0,\n    missingFields\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2272,
+        32
+      ],
+      "id": "ffcd3a95-b120-4c94-896e-36c5b8e72ab7",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $json;\n\nreturn {\n  json: {\n    name: String(lead.Name).trim(),\n    email: String(lead.Email).trim().toLowerCase(),\n    company: String(lead.Company).trim(),\n    service: String(lead.Service).trim(),\n    budget: Number(lead.Budget)\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1856,
+        -80
+      ],
+      "id": "78de377e-0b0e-4966-9405-688ad0aa89c5",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $json;\n\nlet budgetScore = 0;\nlet serviceScore = 0;\n\nif (lead.budget >= 100000) {\n  budgetScore = 50;\n} else if (lead.budget >= 50000) {\n  budgetScore = 30;\n} else {\n  budgetScore = 10;\n}\n\nconst service = lead.service.toLowerCase();\n\nif (\n  service.includes(\"web\") ||\n  service.includes(\"mobile\") ||\n  service.includes(\"ai\") ||\n  service.includes(\"automation\")\n) {\n  serviceScore = 30;\n} else {\n  serviceScore = 10;\n}\n\nconst totalScore = budgetScore + serviceScore;\n\nreturn {\n  json: {\n    ...lead,\n    budgetScore,\n    serviceScore,\n    totalScore\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1648,
+        -80
+      ],
+      "id": "e2611cab-30d7-47d3-b90c-0df6c87fbfdc",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const score = $json.totalScore;\n\nlet priority;\n\nif (score >= 80) {\n  priority = \"High\";\n} else if (score >= 50) {\n  priority = \"Medium\";\n} else {\n  priority = \"Low\";\n}\n\nreturn {\n  json: {\n    ...$json,\n    priority\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1440,
+        -80
+      ],
+      "id": "f1a2d978-776d-414c-a625-04975431611d",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "High",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "85fc3064-05ea-4eb7-a4b7-e03c802c2a05"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "96dc744b-0130-453d-b5ce-07177ef99f14",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "Medium",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b277d32b-ca43-4fc5-9d30-70d11bbdae4a",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "Less",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1232,
+        -80
+      ],
+      "id": "49e1b6f4-758e-482e-b340-9365bd3c43e0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=🚨 High Priority Lead: {{ $json.name }}",
+        "message": "=A new high-priority lead has been received.  Name: {{ $json.name }} Email: {{ $json.email }} Company: {{ $json.company }} Service: {{ $json.service }} Budget: {{ $json.budget }} Score: {{ $json.totalScore }} Priority: {{ $json.priority }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -1024,
+        -96
+      ],
+      "id": "edaa9966-5a80-4d92-b6b3-c149f3a03a18",
+      "name": "Send a message",
+      "webhookId": "e0edf169-ba6f-4c1e-959a-272de20a808a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1v940QReiSXaUPez",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wOHYADJQivkUFLOBFmOcX67AEz9Ue0VnamNDcRAHqOU",
+          "mode": "list",
+          "cachedResultName": "Medium Priority Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wOHYADJQivkUFLOBFmOcX67AEz9Ue0VnamNDcRAHqOU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wOHYADJQivkUFLOBFmOcX67AEz9Ue0VnamNDcRAHqOU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "= {{ $json.name }} ",
+            "Email": "={{ $json.email }}",
+            "Company": "={{ $json.company }}",
+            "Budget": "={{ $json.budget }}",
+            "Priority": "={{ $json.priority }}",
+            "Score": "={{ $json.totalScore }}",
+            "Service": "={{ $json.service }} "
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -928,
+        32
+      ],
+      "id": "d405cb91-1faa-4179-9c63-c100af4fd168",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1o_4Bt_yxQjyCpt6ld2YQ8IpoTVOLfvLB5YppMW4SmPU",
+          "mode": "list",
+          "cachedResultName": "low priority sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o_4Bt_yxQjyCpt6ld2YQ8IpoTVOLfvLB5YppMW4SmPU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1o_4Bt_yxQjyCpt6ld2YQ8IpoTVOLfvLB5YppMW4SmPU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }} ",
+            "Email": "={{ $json.email }} ",
+            "Company": "={{ $json.company }}",
+            "Service": "={{ $json.service }}",
+            "Budget": "={{ $json.budget }}",
+            "Priority": "={{ $json.priority }}",
+            "Score": "={{ $json.totalScore }}",
+            "FollowUp": "Yes"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FollowUp",
+              "displayName": "FollowUp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -928,
+        144
+      ],
+      "id": "f62230e1-a144-4fd5-b25d-1fa469a36dbf",
+      "name": "Append row in sheet1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-management",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2480,
+        32
+      ],
+      "id": "45ec6113-a72e-4170-b325-f8b788d97edf",
+      "name": "Webhook1",
+      "webhookId": "381ac818-f01e-4a15-b3e6-b654496e9588"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a4263a8f-ae4f-44d4-9e8f-5a58daeb0e14",
+              "leftValue": "= {{ $json.isValid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2064,
+        32
+      ],
+      "id": "7567ebe8-2d70-4848-931f-e2bbc471abc5",
+      "name": "If1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e51a0510-cc16-4699-a914-236a82cb6f0f",
+  "meta": {
+    "instanceId": "67736cbdfcb59f25d119984b6f32071b416a4e164ca560c448a6971506943b67"
+  },
+  "nodeGroups": [],
+  "id": "p3UioVCRcRHZMayB",
+  "tags": []
+}

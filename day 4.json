@@ -1,0 +1,279 @@
+{
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5324c9a2-acfb-478d-8c96-3b3992fcdbd8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "return [\n    {\"json\": {\"name\": \"Ali\", \"email\": \"ali@gmail.com\", \"score\": 95}},\n    {\"json\": {\"name\": \"Ahmed\", \"email\": \"ahmed@gmail.com\", \"score\": 82}},\n    {\"json\": {\"name\": \"Sara\", \"email\": \"sara@gmail.com\", \"score\": 75}},\n    {\"json\": {\"name\": \"Fatima\", \"email\": \"fatima@gmail.com\", \"score\": 68}},\n    {\"json\": {\"name\": \"Ayesha\", \"email\": \"ayesha@gmail.com\", \"score\": 91}},\n    {\"json\": {\"name\": \"Usman\", \"email\": \"usman@gmail.com\", \"score\": 59}},\n    {\"json\": {\"name\": \"Bilal\", \"email\": \"bilal@gmail.com\", \"score\": 88}},\n    {\"json\": {\"name\": \"Hamza\", \"email\": \"hamza@gmail.com\", \"score\": 45}},\n    {\"json\": {\"name\": \"Hira\", \"email\": \"hira@gmail.com\", \"score\": 70}},\n    {\"json\": {\"name\": \"Zain\", \"email\": \"zain@gmail.com\", \"score\": 55}}\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4c770857-7300-4f08-98e5-2bac8bb08f33",
+      "name": "Code in Python"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ea8f43e9-d017-4a1c-ae53-78748bcc1167",
+              "leftValue": "={{$json.score}}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "5e90c3ed-5e85-4654-ae51-3d870d704dd3",
+              "leftValue": "={{$json.score}}",
+              "rightValue": "80",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d9e56e10-a50c-41b6-86b1-253e4b2558d9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6dda635-eeee-4374-8fb8-23620cf1b7bd",
+              "name": "group",
+              "value": "excellent",
+              "type": "string"
+            },
+            {
+              "id": "40448064-9b21-4f0e-9fcd-8cd575dcdf9b",
+              "name": "next-action",
+              "value": "send congratulations email",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "c6a3b482-7250-408e-82e7-7b520f12530c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8d8168f9-f6c8-4b9c-8755-8dda808aecd9",
+              "leftValue": "={{$json.score}}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "635755ad-1b5c-499c-bf2b-dc5766f70737",
+              "leftValue": "={{$json.score}}",
+              "rightValue": "60",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        96
+      ],
+      "id": "d29ea2f9-e821-465e-8326-99f65a1f0435",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99b6bb92-cbd4-45fc-bfd4-089f05e5c65d",
+              "name": "group",
+              "value": "Good",
+              "type": "string"
+            },
+            {
+              "id": "c9fc10ff-e980-4f8f-aa58-1c7a661f8075",
+              "name": "next_action",
+              "value": "Encourage improvement",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        832,
+        0
+      ],
+      "id": "884d08f3-ab8b-4ab2-8f42-73b7b8c12b88",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "877f7e36-2466-4bc7-9d6e-a8730b6ee80d",
+              "name": "group",
+              "value": "Needs Improvement",
+              "type": "string"
+            },
+            {
+              "id": "29692842-27b6-4352-8f4f-7f9eb6ed3fe2",
+              "name": "next_action",
+              "value": "Schedule extra training",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        832,
+        192
+      ],
+      "id": "6c9c259b-09b3-4dbf-8f37-46fa6bffbc66",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in Python",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c46b417e-fc86-4f0c-aa9e-4baf6ded473d",
+  "meta": {
+    "instanceId": "aba4da0a0a4dbb957085b8f56d4f8710857a32b8da6181b464780c53255fa37e"
+  },
+  "nodeGroups": [],
+  "id": "4oYICZ6vwYcKh44Z",
+  "tags": []
+}

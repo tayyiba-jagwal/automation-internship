@@ -1,0 +1,288 @@
+{
+  "name": "Strict AI Email Classification - Validation + Fallback",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "37bfcc30-d5c8-474f-825a-4e513e8eb8d1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "email1",
+              "name": "email",
+              "value": "Hi, I ordered your product last week and I really like it, but the delivery is late. Can someone tell me when it will arrive? I also want to know whether I can get a discount on my next order because of the delay.",
+              "type": "string"
+            },
+            {
+              "id": "subject1",
+              "name": "subject",
+              "value": "Order problem",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "73fe01e1-4a9b-4686-b774-45e0efbd90d3",
+      "name": "Test Confusing Email",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -960,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nreturn [{\n  json: {\n    ...input,\n   aiResponse: {\n  category: \"Support\",\n  priority: \"Medium\",\n  sentiment: \"Neutral\",\n  department: \"Customer Support\",\n  summary: \"Customer reports a delayed delivery and asks about a discount.\"\n}\n  }\n}];"
+      },
+      "id": "218680e2-49a1-45eb-a0ee-14d8cedf6b59",
+      "name": "AI Analysis (Test)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json.aiResponse;\nconst allowed = {\n  category: [\"Sales\", \"Support\", \"Complaint\"],\n  priority: [\"Low\", \"Medium\", \"High\"],\n  sentiment: [\"Positive\", \"Neutral\", \"Negative\"],\n  department: [\"Sales\", \"Customer Support\", \"Management\"]\n};\n\nconst required = [\"category\", \"priority\", \"sentiment\", \"department\", \"summary\"];\nconst keys = Object.keys(data || {});\nconst errors = [];\n\nfor (const field of required) {\n  if (!(field in (data || {}))) errors.push(`Missing field: ${field}`);\n}\n\nfor (const field of [\"category\", \"priority\", \"sentiment\", \"department\"]) {\n  if (data?.[field] !== undefined && !allowed[field].includes(data[field])) {\n    errors.push(`Invalid ${field}: ${data[field]}`);\n  }\n}\n\nif (typeof data?.summary !== \"string\" || !data.summary.trim()) {\n  errors.push(\"summary must be a non-empty string\");\n}\n\nconst unexpected = keys.filter(k => !required.includes(k));\nif (unexpected.length) errors.push(`Unexpected fields: ${unexpected.join(\", \")}`);\n\nreturn [{\n  json: {\n    ...$json,\n    valid: errors.length === 0,\n    validationErrors: errors\n  }\n}];"
+      },
+      "id": "e6e31baf-f98c-487a-b3b9-e3f3af32f259",
+      "name": "Validate JSON Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "valid1",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ba2da7be-45c8-4808-8831-2e768fb37134",
+      "name": "Is Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "v1",
+              "name": "category",
+              "value": "={{ $json.aiResponse.category }}",
+              "type": "string"
+            },
+            {
+              "id": "v2",
+              "name": "priority",
+              "value": "={{ $json.aiResponse.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "v3",
+              "name": "sentiment",
+              "value": "={{ $json.aiResponse.sentiment }}",
+              "type": "string"
+            },
+            {
+              "id": "v4",
+              "name": "department",
+              "value": "={{ $json.aiResponse.department }}",
+              "type": "string"
+            },
+            {
+              "id": "v5",
+              "name": "summary",
+              "value": "={{ $json.aiResponse.summary }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "358ca860-38eb-4571-90fe-704a4c47f1c0",
+      "name": "Valid Output",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "category",
+              "value": "Support",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "priority",
+              "value": "Medium",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "sentiment",
+              "value": "Neutral",
+              "type": "string"
+            },
+            {
+              "id": "f4",
+              "name": "department",
+              "value": "Customer Support",
+              "type": "string"
+            },
+            {
+              "id": "f5",
+              "name": "summary",
+              "value": "Unable to reliably classify the email. Manual review required.",
+              "type": "string"
+            },
+            {
+              "id": "f6",
+              "name": "fallbackTriggered",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "f7",
+              "name": "validationErrors",
+              "value": "={{ $json.validationErrors }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5a2b8f1e-2c57-40da-b86e-ee5c23f1bf0a",
+      "name": "Fallback - Manual Review",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        240
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Test Confusing Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Confusing Email": {
+      "main": [
+        [
+          {
+            "node": "AI Analysis (Test)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Analysis (Test)": {
+      "main": [
+        [
+          {
+            "node": "Validate JSON Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate JSON Contract": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Valid Output",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback - Manual Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9cdce33a-7d7b-4502-8bcc-ee7b1d7d0922",
+  "meta": {
+    "instanceId": "67736cbdfcb59f25d119984b6f32071b416a4e164ca560c448a6971506943b67"
+  },
+  "nodeGroups": [],
+  "id": "L53QX4lJjH57YTkg",
+  "tags": []
+}
