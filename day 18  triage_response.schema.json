@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/ai-support-triage-response.schema.json",
+  "title": "AI Support Triage Response",
+  "description": "Structured JSON object the AI model (Gemini) must return when triaging an incoming customer support message. Consumed by the 'Parse AI Response' node in the AI Customer Support Triage System n8n workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "category",
+    "priority",
+    "sentiment",
+    "department",
+    "summary",
+    "suggested_response",
+    "urgent_flag"
+  ],
+  "properties": {
+    "category": {
+      "type": "string",
+      "description": "The type of issue the customer is raising.",
+      "enum": [
+        "billing",
+        "technical",
+        "account",
+        "complaint",
+        "refund_request",
+        "feature_request",
+        "general_inquiry",
+        "other"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "description": "How urgently the ticket needs to be handled.",
+      "enum": ["low", "medium", "high", "urgent"]
+    },
+    "sentiment": {
+      "type": "string",
+      "description": "The customer's emotional tone, independent of issue severity.",
+      "enum": ["positive", "neutral", "negative", "very_negative"]
+    },
+    "department": {
+      "type": "string",
+      "description": "The team the ticket should be routed to.",
+      "enum": [
+        "billing",
+        "technical_support",
+        "customer_success",
+        "sales",
+        "management"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "description": "One to two sentence summary of the customer's issue.",
+      "minLength": 1
+    },
+    "suggested_response": {
+      "type": "string",
+      "description": "A short, empathetic draft reply an agent can send or lightly edit.",
+      "minLength": 1
+    },
+    "urgent_flag": {
+      "type": "boolean",
+      "description": "Must be true if and only if priority is 'urgent'."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "priority": { "const": "urgent" } },
+        "required": ["priority"]
+      },
+      "then": {
+        "properties": { "urgent_flag": { "const": true } }
+      },
+      "else": {
+        "properties": { "urgent_flag": { "const": false } }
+      }
+    }
+  ]
+}
